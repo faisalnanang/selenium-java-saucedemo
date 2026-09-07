@@ -26,7 +26,7 @@ public class UiValidationTest extends BaseTest {
         new LoginPage(driver).login(Users.STANDARD.username(), Users.STANDARD.password());
         InventoryPage inventory = new InventoryPage(driver);
         inventory.expectLoaded();
-        Assert.assertEquals(inventory.titleText(), "Wrong title");
+        Assert.assertEquals(inventory.titleText(), "Products");
         inventory.addProduct("sauce-labs-backpack");
         inventory.openCart();
         CartPage cart = new CartPage(driver);
