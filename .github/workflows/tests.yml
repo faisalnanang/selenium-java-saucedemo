@@ -23,7 +23,7 @@ jobs:
           node-version: '20'
           cache: npm
       - run: npm ci
-      - run: mvn clean test -Dheadless=true -DretryCount=2
+      - run: npm test -- -Dheadless=true -DretryCount=2
       - if: always()
         run: npm run allure:generate
       - if: always()
