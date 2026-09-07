@@ -71,3 +71,15 @@ jobs:
         with:
           path: .ci/allure-history
           key: allure-history-${{ github.run_id }}
+      - if: always()
+        name: Print report links
+        run: |
+          RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+          PAGES_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/"
+          echo "Allure artifact and logs: ${RUN_URL}"
+          echo "GitHub Pages report: ${PAGES_URL}"
+          {
+            echo "## Test Report Links"
+            echo "- [Allure artifact and workflow logs](${RUN_URL})"
+            echo "- [GitHub Pages report](${PAGES_URL})"
+          } >> "${GITHUB_STEP_SUMMARY}"
