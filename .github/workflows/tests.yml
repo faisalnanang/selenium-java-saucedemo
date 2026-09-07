@@ -26,8 +26,20 @@ jobs:
         with:
           node-version: '20'
           cache: npm
+      - name: Restore Allure history
+        uses: actions/cache/restore@v4
+        with:
+          path: .ci/allure-history
+          key: allure-history-${{ github.run_id }}
+          restore-keys: |
+            allure-history-
       - run: npm ci
       - run: npm test -- -Dheadless=true -DretryCount=2
+      - if: always() && hashFiles('allure-results/latest/**') != ''
+        name: Add history to Allure results
+        run: |
+          mkdir -p allure-results/latest/history
+          if [ -d .ci/allure-history ]; then cp -R .ci/allure-history/. allure-results/latest/history/; fi
       - if: always()
         run: npm run allure:generate
       - if: always()
@@ -45,3 +57,14 @@ jobs:
       - if: always() && hashFiles('allure-report/index.html') != ''
         id: deployment
         uses: actions/deploy-pages@v4
+      - if: always() && hashFiles('allure-report/history/**') != ''
+        name: Save Allure history
+        run: |
+          mkdir -p .ci/allure-history
+          cp -R allure-report/history/. .ci/allure-history/
+      - if: always() && hashFiles('allure-report/history/**') != ''
+        name: Cache Allure history
+        uses: actions/cache/save@v4
+        with:
+          path: .ci/allure-history
+          key: allure-history-${{ github.run_id }}
