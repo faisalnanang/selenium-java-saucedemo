@@ -36,6 +36,9 @@ jobs:
       - run: npm ci
       - run: npm test -- -Dheadless=true -DretryCount=2
       - if: always() && hashFiles('allure-results/latest/**') != ''
+        name: Add Allure metadata
+        run: npm run allure:metadata
+      - if: always() && hashFiles('allure-results/latest/**') != ''
         name: Add history to Allure results
         run: |
           mkdir -p allure-results/latest/history

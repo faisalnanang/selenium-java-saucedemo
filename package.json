@@ -7,6 +7,7 @@
     "test:login": "node scripts/run-tests-with-allure-backup.cjs -Dtest=LoginTest",
     "test:ecommerce": "node scripts/run-tests-with-allure-backup.cjs -Dtest=CheckoutTest",
     "test:validation": "node scripts/run-tests-with-allure-backup.cjs -Dtest=UiValidationTest",
+    "allure:metadata": "node scripts/add-allure-metadata.cjs",
     "allure:generate": "node scripts/generate-latest-allure.cjs",
     "allure:serve": "node scripts/serve-latest-allure.cjs",
     "allure:single-file": "node scripts/generate-latest-allure-single-file.cjs"
