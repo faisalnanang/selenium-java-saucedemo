@@ -9,6 +9,7 @@ import org.testng.Assert;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
+import support.AllureScreenshot;
 
 public class CheckoutPage {
     private final WebDriver driver;
@@ -35,6 +36,7 @@ public class CheckoutPage {
 
     public void continueToOverview() {
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[data-test='continue']"))).click();
+        AllureScreenshot.attach(driver, "Checkout overview page loaded");
     }
 
     public void expectInformationError(String message) {
@@ -79,5 +81,6 @@ public class CheckoutPage {
 
     public void finish() {
         wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("[data-test='finish']"))).click();
+        AllureScreenshot.attach(driver, "Order confirmation page loaded");
     }
 }

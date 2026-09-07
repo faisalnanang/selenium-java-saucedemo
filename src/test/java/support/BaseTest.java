@@ -15,11 +15,13 @@ public abstract class BaseTest {
         driver = DriverFactory.create();
         videoRecorder = new VideoRecorder();
         videoRecorder.start();
+        AllureScreenshot.attach(driver, "Before test");
     }
 
     @AfterMethod(alwaysRun = true)
     public void tearDown() {
         if (driver != null) {
+            AllureScreenshot.attach(driver, "After test");
             driver.quit();
         }
     }

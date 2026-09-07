@@ -8,6 +8,7 @@ import org.testng.Assert;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
+import support.AllureScreenshot;
 
 public class InventoryPage {
     private final WebDriver driver;
@@ -29,6 +30,7 @@ public class InventoryPage {
         var cart = wait.until(ExpectedConditions.elementToBeClickable(cartLink));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", cart);
         wait.until(ExpectedConditions.urlContains("cart.html"));
+        AllureScreenshot.attach(driver, "Cart page loaded");
     }
     public void expectCartCount(int count) { Assert.assertEquals(wait.until(ExpectedConditions.visibilityOfElementLocated(cartBadge)).getText(), String.valueOf(count)); }
     public void sortBy(String value) { new Select(wait.until(ExpectedConditions.visibilityOfElementLocated(sort))).selectByValue(value); }
