@@ -1,0 +1,36 @@
+name: Selenium Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      BASE_URL: https://www.saucedemo.com
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - run: npm ci
+      - run: mvn clean test -Dheadless=true -DretryCount=2
+      - if: always()
+        run: npm run allure:generate
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-report
+          path: |
+            allure-report
+            target/allure-results
+            target/surefire-reports

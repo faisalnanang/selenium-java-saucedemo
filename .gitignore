@@ -1,0 +1,7 @@
+target/
+node_modules/
+allure-results/
+allure-report/
+.idea/
+.vscode/
+*.iml

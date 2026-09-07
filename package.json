@@ -1,0 +1,17 @@
+{
+  "name": "selenium-saucedemo-reporting",
+  "private": true,
+  "scripts": {
+    "test": "node scripts/run-tests-with-allure-backup.cjs",
+    "test:headed": "node scripts/run-tests-with-allure-backup.cjs -Pheaded",
+    "test:login": "node scripts/run-tests-with-allure-backup.cjs -Dtest=LoginTest",
+    "test:ecommerce": "node scripts/run-tests-with-allure-backup.cjs -Dtest=CheckoutTest",
+    "test:validation": "node scripts/run-tests-with-allure-backup.cjs -Dtest=UiValidationTest",
+    "allure:generate": "node scripts/generate-latest-allure.cjs",
+    "allure:serve": "node scripts/serve-latest-allure.cjs",
+    "allure:single-file": "node scripts/generate-latest-allure-single-file.cjs"
+  },
+  "devDependencies": {
+    "allure-commandline": "^2.43.0"
+  }
+}

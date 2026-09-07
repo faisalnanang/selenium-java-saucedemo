@@ -1,0 +1,15 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="SauceDemo Test Suite" parallel="classes" thread-count="3">
+  <listeners>
+    <listener class-name="support.TestFailureListener"/>
+    <listener class-name="support.AllureListener"/>
+  </listeners>
+  
+  <test name="SauceDemo Tests">
+    <classes>
+      <class name="tests.LoginTest"/>
+      <class name="tests.CheckoutTest"/>
+      <class name="tests.UiValidationTest"/>
+    </classes>
+  </test>
+</suite>
