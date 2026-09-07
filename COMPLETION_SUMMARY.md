@@ -157,34 +157,27 @@ node scripts/serve-latest-allure.cjs
 
 ## 🎨 Dashboard Preview
 
-```
-┌─────────────────────────────────────────────┐
-│ 🔷 GILIGILI - Allure Report               │
-├─────────────────────────────────────────────┤
-│                                             │
-│  STATISTICS                                 │
-│  ✓ Passed:     7                           │
-│  ✗ Failed:     1 (intentional UI test)    │
-│  ⊘ Skipped:    0                           │
-│  Duration:    45.2 seconds                 │
-│                                             │
-│  TRENDS                                    │
-│  Last run:    25-Aug-2026 14:32           │
-│  History:     Graph visualization        │
-│                                             │
-│  ENVIRONMENT                                │
-│  Browser:     Chrome Headless             │
-│  Platform:    Windows 11 / Java 17        │
-│  Allure:      2.29.1                      │
-│                                             │
-│  CATEGORIES                                 │
-│  🔷 Custom Branding                       │
-│  🔷 Screenshot Artifacts                  │
-│  🔷 Video Artifacts (if ffmpeg)           │
-│  🔷 Performance Trace                     │
-│                                             │
-└─────────────────────────────────────────────┘
-```
+This project uses a live GitHub Actions workflow instead of a static dashboard mock. The workflow runs the Selenium suite in headless Chrome and uploads the Allure report and test evidence as build artifacts.
+
+[![Selenium Tests](https://github.com/faisalnanang/selenium-java-saucedemo/actions/workflows/tests.yml/badge.svg)](https://github.com/faisalnanang/selenium-java-saucedemo/actions/workflows/tests.yml)
+
+| Live preview | What it shows |
+| --- | --- |
+| [GitHub Actions runs](https://github.com/faisalnanang/selenium-java-saucedemo/actions/workflows/tests.yml) | Actual pass/fail status, duration, logs, and test execution history |
+| [Latest workflow run](https://github.com/faisalnanang/selenium-java-saucedemo/actions) | Current CI result from the repository |
+| [CI workflow definition](.github/workflows/tests.yml) | Java 17, Node 20, Maven, headless browser, retry, and artifact steps |
+| [Project README](README.md) | Real commands, coverage, architecture, and reporting workflow |
+
+### CI Evidence
+
+Each completed run can expose:
+
+- Maven Surefire test reports
+- Allure results and generated report output
+- Failure screenshots and page source when a test fails
+- Browser performance logs and optional video artifacts
+
+The numbers shown in the Actions run are the source of truth. No static pass/fail values are hardcoded in this document.
 
 ---
 
