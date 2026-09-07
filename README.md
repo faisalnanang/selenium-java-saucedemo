@@ -251,6 +251,8 @@ Failed tests can attach:
 - Browser performance logs
 - Desktop MP4 recording when headed mode and `ffmpeg` are available
 
+Allure also captures screenshots before and after every test, plus key page transitions such as login, cart, checkout, and order confirmation.
+
 The npm runner removes `JAVA_TOOL_OPTIONS` and `_JAVA_OPTIONS` before launching Maven. This prevents machine-wide Java instrumentation, including Micro Focus UFT hooks, from slowing or blocking the test process.
 
 ## Test coverage
