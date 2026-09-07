@@ -8,6 +8,10 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     env:
       CI: true
       BASE_URL: https://www.saucedemo.com
@@ -34,3 +38,10 @@ jobs:
             allure-report
             target/allure-results
             target/surefire-reports
+      - if: always() && hashFiles('allure-report/index.html') != ''
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+      - if: always() && hashFiles('allure-report/index.html') != ''
+        id: deployment
+        uses: actions/deploy-pages@v4
