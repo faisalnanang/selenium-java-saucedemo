@@ -2,6 +2,7 @@ target/
 node_modules/
 allure-results/
 allure-report/
+allure-single-file/
 .idea/
 .vscode/
 *.iml
