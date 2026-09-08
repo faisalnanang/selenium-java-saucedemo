@@ -1,82 +1,150 @@
-name: Selenium Tests
+name: Selenium CI and Allure Pages
 
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
   workflow_dispatch:
 
 jobs:
   test:
+    name: Run Selenium tests and build reports
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      pages: write
-      id-token: write
     env:
       CI: true
       BASE_URL: https://www.saucedemo.com
+    outputs:
+      tests_outcome: ${{ steps.selenium.outcome }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
           cache: maven
-      - uses: actions/setup-node@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
+
+      - name: Install report dependencies
+        run: npm ci
+
       - name: Restore Allure history
         uses: actions/cache/restore@v4
         with:
           path: .ci/allure-history
-          key: allure-history-${{ github.run_id }}
+          key: allure-history-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
-            allure-history-
-      - run: npm ci
-      - run: npm test -- -Dheadless=true -DretryCount=2
-      - if: always() && hashFiles('allure-results/latest/**') != ''
-        name: Add Allure metadata
+            allure-history-${{ github.ref_name }}-
+
+      - name: Run Selenium tests
+        id: selenium
+        continue-on-error: true
+        run: npm test -- -Dheadless=true -DretryCount=2
+
+      - name: Add Allure metadata
+        if: always() && hashFiles('allure-results/latest/**') != ''
         run: npm run allure:metadata
-      - if: always() && hashFiles('allure-results/latest/**') != ''
-        name: Add history to Allure results
+
+      - name: Restore history into Allure results
+        if: always() && hashFiles('allure-results/latest/**') != ''
         run: |
           mkdir -p allure-results/latest/history
-          if [ -d .ci/allure-history ]; then cp -R .ci/allure-history/. allure-results/latest/history/; fi
-      - if: always()
+          if [ -d .ci/allure-history ]; then
+            cp -R .ci/allure-history/. allure-results/latest/history/
+          fi
+
+      - name: Generate static Allure report
+        if: always() && hashFiles('allure-results/latest/**') != ''
+        continue-on-error: true
         run: npm run allure:generate
-      - if: always()
+
+      - name: Generate single-file Allure report
+        if: always() && hashFiles('allure-results/latest/**') != ''
+        continue-on-error: true
+        run: npm run allure:single-file
+
+      - name: Upload Allure report artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: allure-report
           path: |
             allure-report
+            allure-single-file/saucedemo-latest.html
             target/allure-results
             target/surefire-reports
-      - if: always() && hashFiles('allure-report/index.html') != ''
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: allure-report
-      - if: always() && hashFiles('allure-report/index.html') != ''
-        id: deployment
-        uses: actions/deploy-pages@v4
-      - if: always() && hashFiles('allure-report/history/**') != ''
-        name: Save Allure history
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Save Allure history
+        if: always() && hashFiles('allure-report/history/**') != ''
         run: |
           mkdir -p .ci/allure-history
           cp -R allure-report/history/. .ci/allure-history/
-      - if: always() && hashFiles('allure-report/history/**') != ''
-        name: Cache Allure history
+
+      - name: Cache Allure history
+        if: always() && hashFiles('.ci/allure-history/**') != ''
         uses: actions/cache/save@v4
         with:
           path: .ci/allure-history
-          key: allure-history-${{ github.run_id }}
-      - if: always()
-        name: Print report links
+          key: allure-history-${{ github.ref_name }}-${{ github.run_id }}
+
+      - name: Mark CI failed when tests fail
+        if: steps.selenium.outcome == 'failure'
+        run: exit 1
+
+  deploy:
+    name: Deploy Allure report to GitHub Pages
+    needs: test
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Download Allure report artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: allure-report
+          path: report-artifact
+
+      - name: Configure GitHub Pages
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload Pages artifact
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: report-artifact/allure-report
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+        uses: actions/deploy-pages@v4
+
+      - name: Print report links
+        if: always()
         run: |
           RUN_URL="${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
           PAGES_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/"
-          echo "Allure artifact and logs: ${RUN_URL}"
+          echo "Allure artifact and workflow logs: ${RUN_URL}"
           echo "GitHub Pages report: ${PAGES_URL}"
           {
             echo "## Test Report Links"
